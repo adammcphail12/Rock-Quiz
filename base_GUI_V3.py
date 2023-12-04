@@ -152,7 +152,7 @@ class Play:
         self.results_label.grid(row=2,column=0,padx=10,pady=10)
 
         # creates next round button.
-        self.next_round = Button(self.play_frame,text= 'Next Round',fg='#FFFFFF',bg='#FFF2CC',width=10,font=('Arial', '12','bold'),command = lambda: self.new_round(),state=DISABLED)
+        self.next_round = Button(self.play_frame,text= 'Next Round',fg='#000000',bg='#FFF2CC',width=10,font=('Arial', '12','bold'),command = lambda: self.new_round(),state=DISABLED)
         self.next_round.grid(row=2,column=1,padx=5,pady=5)
 
         self.new_round()
@@ -175,6 +175,8 @@ class Play:
 
         self.control_button_ref = []
 
+        # creates control buttons in a loop
+
         for item in range(0,3):
             self.make_control_button=Button(self.control_frame,\
                                             fg='#FFFFFF',bg=control_buttons[item][0],\
@@ -186,6 +188,9 @@ class Play:
             self.control_button_ref.append(self.make_control_button)
         self.to_help_btn = self.control_button_ref[0]
         self.to_stats_btn = self.control_button_ref[1]
+
+        self.to_stats_btn.config(state = DISABLED)
+
 
 
 
@@ -243,6 +248,10 @@ class Play:
     
     def new_round(self):
         self.info = self.create_question()
+
+        # enables stats button if more then 0 rounds has been played
+        if self.rounds_played.get() > 0:
+            self.to_stats_btn.config(state = NORMAL)
         
         
 
@@ -275,12 +284,12 @@ class Play:
             self.rounds_won.set(self.rounds_won.get() + 1)
             print('Rounds Won: {}'.format(self.new_round))
             # adjust to show that you got correct and show player profile and change colour 
-            self.results_label.config(text='You answered Correct. Player Profile: {} - {}'.format(self.info[0][0],self.info[0][2]), fg = '#008000')
+            self.results_label.config(text='You answered Correct. Player Profile: {} - {}'.format(self.info[0][0],self.info[0][2]), fg = '#32fc05',bg = '#FFFFFF')
 
         else:
             print('Sorry thats the wrong answer')
             # show that answer is not true and change colour
-            self.results_label.config(text='You answered Incorrect. Player Profile: {} - {}'.format(self.info[0][0],self.info[0][2]), fg = '#FF0000')
+            self.results_label.config(text='You answered Incorrect. Player Profile: {} - {}'.format(self.info[0][0],self.info[0][2]), fg = '#FF0000', bg = '#FFFFFF')
         
         self.rounds_done +=1
         self.rounds_played.set(self.rounds_played.get() + 1)
@@ -304,7 +313,7 @@ class Play:
             self.close_play()
 
     def end_game(self):
-        self.results_label.config(text = 'Congratulations youve finnshed the game with a total score of : {} out of {}'.format(self.rounds_won.get(), self.total_rounds), fg = '#FFFFFF')
+        self.results_label.config(text = 'Congratulations youve finnshed the game with a total score of : {} out of {}'.format(self.rounds_won.get(), self.total_rounds), fg = '#000000')
         self.next_round.config(state=DISABLED)
         
 
@@ -353,8 +362,10 @@ class DisplayStats:
     def __init__(self, partner):
         self.stats_box = Toplevel()
         # setup dialouge box and background colour
+        partner.to_stats_btn.config(state=DISABLED)
 
 
+        # creates all new buttons and labels for my stats function.
         self.stats_frame = Frame ( self.stats_box, bg = '#E6D0DE')
         self.stats_frame.grid()
 
@@ -371,7 +382,7 @@ class DisplayStats:
         else:
             accuracy = 0
         
-        self.stats_percent = Label(self.stats_frame, text = '{}%'.format(accuracy), fg = '#000000', bg = '#C3ABD0', font = ('Arial', '15'))
+        self.stats_percent = Label(self.stats_frame, text = '{:.2f}%'.format(accuracy), fg = '#000000', bg = '#C3ABD0', font = ('Arial', '15'))
         self.stats_percent.grid(row=1,column=1,padx=10,pady=10)
 
         self.stats_dismiss = Button(self.stats_frame,fg='#FFFFFF',bg='#A680B8',text='Dismiss',font=('Arial','14'),command=lambda:self.close_stats(partner))
